@@ -13,12 +13,12 @@ Claim a task by putting your name in **Owner**. Tick items when merged to `main`
 - [ ] Develop real-time visual feedback
 
 ### Task 2: AI & Emergency Classification — Owner: _TBD_
-- [ ] Integrate an AI model for understanding user descriptions
-- [ ] Develop emergency scenario classification using reported symptoms and observations
-- [ ] Create predefined, medically reviewed emergency response protocols
-- [ ] Implement a decision-making workflow for selecting appropriate instructions
-- [ ] Handle uncertain predictions and unknown emergency scenarios
-- [ ] Prioritize emergency calls and dispatcher instructions
+- [x] Integrate an AI model for understanding user descriptions
+- [x] Develop emergency scenario classification using reported symptoms and observations
+- [x] Create predefined, medically reviewed emergency response protocols
+- [x] Implement a decision-making workflow for selecting appropriate instructions
+- [x] Handle uncertain predictions and unknown emergency scenarios
+- [x] Prioritize emergency calls and dispatcher instructions
 
 ### Task 3: Voice Assistant — Owner: _TBD_
 - [ ] Implement speech-to-text recognition

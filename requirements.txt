@@ -1,3 +1,5 @@
 opencv-python
 mediapipe
 pyserial
+pyyaml
+anthropic

@@ -1,0 +1,41 @@
+id: allergic_reaction
+title: Severe allergic reaction (anaphylaxis)
+priority: 2
+escalate_to_emergency_services: true
+dispatcher_summary: "Suspected anaphylaxis; epinephrine auto-injector use being assisted if available."
+clarifying_question: "Do they have swelling of the face or throat, hives, or trouble breathing after contact with an allergen?"
+trigger_signs:
+  hives_swelling: 0.5
+  swollen_tongue_throat: 0.85
+  wheezing: 0.4
+  abnormal_breathing: 0.3
+  known_allergen_exposure: 0.5
+  dizzy_faint: 0.2
+steps:
+  - id: call_911
+    text: Call emergency services. Say "anaphylaxis".
+    spoken: "Call 911 now and say anaphylaxis."
+    observable_action: null
+    needs_confirmation: true
+  - id: epinephrine
+    text: If the person has an epinephrine auto-injector, help them use it on the outer thigh right away.
+    spoken: "If they have an epinephrine pen, use it now on the outer thigh."
+    observable_action: epinephrine_injection
+    needs_confirmation: true
+  - id: position
+    text: Lay them flat with legs raised. If breathing is difficult, let them sit up. If vomiting, lay on side.
+    spoken: "Lay them flat with legs raised. If they struggle to breathe, let them sit up."
+    observable_action: null
+    needs_confirmation: false
+  - id: second_dose
+    text: If symptoms do not improve in 5-15 minutes and a second injector is available, give it.
+    spoken: "If no better in five to fifteen minutes and you have a second pen, use it."
+    observable_action: null
+    needs_confirmation: true
+  - id: cpr_ready
+    text: If they stop breathing, start CPR.
+    spoken: "If they stop breathing, start CPR."
+    observable_action: null
+    needs_confirmation: false
+reviewed_by: PENDING_MEDICAL_REVIEW
+source: "Red Cross / FARE anaphylaxis guidance (to be verified by reviewer)"
