@@ -4,7 +4,7 @@
     {
       "name": "visioner-ui",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "5173", "--directory", "src/ui"],
+      "runtimeArgs": ["-m", "src.vision.server", "5173"],
       "port": 5173
     }
   ]

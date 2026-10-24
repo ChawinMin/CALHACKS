@@ -54,3 +54,14 @@ VisionER.state                  // current step, target, detections, hold time
 - Labels: `gloves`, `call911`, `wound`, `gauze`, `trauma_pad`, `bandage`, `soak`, `pressure`. Case, spaces and dashes don't matter.
 
 Detection runs in the browser too: call the hooks from the same page, e.g. a MediaPipe or TensorFlow.js model reading `document.getElementById("cam")`. There is no server to send detections to.
+
+## Wound detection (trained on `dataset/Wound_dataset`)
+
+```bash
+python -m src.vision.wound_model train   # once; writes src/vision/models/wound_head.pt
+python -m src.vision.server              # serves this UI and POST /api/classify on :5173
+```
+
+`wound.js` sends a camera frame every ~600 ms and drives the hooks above. Cut, laceration and stab wound lead into the bleeding flow (`setTarget` with a class-activation-map box, then `setDetected("wound")` once 3 frames agree during "Find the wound"). Abrasions, bruises, burns and ingrown nails are labelled but do not start the gauze flow. **Load wound photo…** in the console uses a dataset image as the camera, so the flow can be tried without a real wound.
+
+Held-out accuracy (20% split, 87 images): 82% over 7 types, 90% bleeding vs not. Stab wound is weak (5 test images). The dataset has no "no wound" class, so non-wound scenes are only rejected by a 55% confidence floor. The wound box is a heat-map estimate, not a trained detector.

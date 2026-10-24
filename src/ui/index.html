@@ -19,6 +19,7 @@
       <span class="brand-tag">AR first aid · Cal Hacks simulation</span>
     </div>
     <div class="topbar-right">
+      <span class="pill" id="woundChip" aria-live="polite" hidden></span>
       <span class="pill" id="sourcePill" aria-live="polite">Simulated scene</span>
       <button class="ghost-btn" id="consoleToggle" aria-pressed="true" title="Toggle operator console (C)">Console</button>
     </div>
@@ -162,6 +163,11 @@
           <button class="seg-btn is-on" data-source="sim">Simulated</button>
           <button class="seg-btn" data-source="webcam">Webcam</button>
         </div>
+        <div class="row">
+          <button class="btn" id="woundLoad">Load wound photo…</button>
+          <input type="file" id="woundFile" accept="image/*" hidden />
+        </div>
+        <ul class="wound-probs" id="woundProbs" aria-label="Wound type scores"></ul>
         <p class="hint" id="sourceHint">Drag on the lens to place the wound target by hand.</p>
       </section>
 
@@ -220,5 +226,6 @@
 
   <script src="protocol.js"></script>
   <script src="app.js"></script>
+  <script src="wound.js"></script>
 </body>
 </html>
