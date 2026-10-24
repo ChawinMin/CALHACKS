@@ -1,0 +1,61 @@
+{
+  "id": "choking",
+  "title": "Choking (adult / child)",
+  "priority": 2,
+  "escalate_to_emergency_services": true,
+  "dispatcher_summary": "Person choking on an obstruction; back blows and abdominal thrusts in progress.",
+  "clarifying_question": "Can the person cough, speak, or breathe at all?",
+  "trigger_signs": {
+    "clutching_throat": 0.85,
+    "cannot_speak_cough": 0.85,
+    "choking_on_food": 0.7,
+    "wheezing": 0.2,
+    "turning_blue": 0.4
+  },
+  "steps": [
+    {
+      "id": "ask",
+      "text": "Ask \"Are you choking?\" If they can cough or speak, encourage coughing and do not hit their back.",
+      "spoken": "Ask: are you choking? If they can cough, let them cough.",
+      "observable_action": null,
+      "needs_confirmation": true
+    },
+    {
+      "id": "call_911",
+      "text": "If they cannot cough, speak or breathe, have someone call emergency services.",
+      "spoken": "If they can't breathe, call 911 or tell someone to.",
+      "observable_action": null,
+      "needs_confirmation": true
+    },
+    {
+      "id": "back_blows",
+      "text": "Lean the person forward and give 5 firm back blows between the shoulder blades with the heel of your hand.",
+      "spoken": "Lean them forward and give five firm blows between the shoulder blades.",
+      "observable_action": "back_blows",
+      "needs_confirmation": false
+    },
+    {
+      "id": "thrusts",
+      "text": "Stand behind, wrap arms around the waist, fist above the navel, give 5 quick inward-and-upward abdominal thrusts.",
+      "spoken": "Now stand behind them, fist above the belly button, and give five quick thrusts inward and upward.",
+      "observable_action": "abdominal_thrusts",
+      "needs_confirmation": false
+    },
+    {
+      "id": "repeat",
+      "text": "Alternate 5 back blows and 5 thrusts until the object comes out or the person becomes unresponsive.",
+      "spoken": "Keep alternating until it comes out or they stop responding.",
+      "observable_action": null,
+      "needs_confirmation": false
+    },
+    {
+      "id": "unresponsive",
+      "text": "If the person becomes unresponsive, lower them to the ground and start CPR.",
+      "spoken": "If they pass out, lay them down and start CPR.",
+      "observable_action": null,
+      "needs_confirmation": false
+    }
+  ],
+  "reviewed_by": "PENDING_MEDICAL_REVIEW",
+  "source": "Red Cross 5-and-5 choking guidance (to be verified by reviewer)"
+}

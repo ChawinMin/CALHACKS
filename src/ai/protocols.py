@@ -1,10 +1,9 @@
 """Loader for medically reviewed protocols. Read-only: the AI may only select by ID."""
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 from pathlib import Path
-
-import yaml
 
 PROTOCOL_DIR = Path(__file__).resolve().parents[2] / "protocols"
 FALLBACK_ID = "unknown_emergency"
@@ -55,9 +54,9 @@ def _parse(data: dict) -> Protocol:
 
 def load_protocols(directory: Path = PROTOCOL_DIR) -> dict[str, Protocol]:
     protocols: dict[str, Protocol] = {}
-    for path in sorted(directory.glob("*.yaml")):
+    for path in sorted(directory.glob("*.json")):
         with path.open(encoding="utf-8") as f:
-            protocol = _parse(yaml.safe_load(f))
+            protocol = _parse(json.load(f))
         protocols[protocol.id] = protocol
     if FALLBACK_ID not in protocols:
         raise FileNotFoundError(f"Required fallback protocol '{FALLBACK_ID}' missing in {directory}")

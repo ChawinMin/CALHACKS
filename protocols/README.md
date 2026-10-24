@@ -2,7 +2,7 @@
 
 Source of truth for all first-aid steps. The AI may only *select* a protocol by ID; it may not edit or invent steps.
 
-Planned files (one per workflow): `cpr.yaml`, `severe_bleeding.yaml`, `stroke.yaml`, `choking.yaml`, `seizure.yaml`, `allergic_reaction.yaml`.
+Planned files (one per workflow): `cpr.json`, `severe_bleeding.json`, `stroke.json`, `choking.json`, `seizure.json`, `allergic_reaction.json`.
 
 Each protocol should include: `id`, `title`, `trigger_signs`, `steps[]` (text, spoken text, observable action, confirmation needed), `escalate_to_emergency_services`, `reviewed_by`, `source`.
 

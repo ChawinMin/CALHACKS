@@ -1,0 +1,68 @@
+{
+  "id": "cpr",
+  "title": "CPR (adult cardiac arrest)",
+  "priority": 1,
+  "escalate_to_emergency_services": true,
+  "dispatcher_summary": "Adult unresponsive and not breathing normally; bystander CPR in progress.",
+  "clarifying_question": "Is the person awake and responding, and are they breathing normally?",
+  "trigger_signs": {
+    "unresponsive": 0.6,
+    "not_breathing": 0.85,
+    "abnormal_breathing": 0.6,
+    "no_pulse": 0.85,
+    "collapsed": 0.3
+  },
+  "steps": [
+    {
+      "id": "check_response",
+      "text": "Tap the person's shoulders and shout \"Are you OK?\"",
+      "spoken": "Tap their shoulders and shout. Are they responding?",
+      "observable_action": "shoulder_tap",
+      "needs_confirmation": true
+    },
+    {
+      "id": "call_911",
+      "text": "Call emergency services (or have someone call) and get an AED.",
+      "spoken": "Call 911 now, or tell someone nearby to call and bring an AED.",
+      "observable_action": null,
+      "needs_confirmation": true
+    },
+    {
+      "id": "position",
+      "text": "Place the person on their back on a firm surface. Kneel beside the chest.",
+      "spoken": "Lay them flat on their back on a firm surface and kneel beside their chest.",
+      "observable_action": "person_supine",
+      "needs_confirmation": true
+    },
+    {
+      "id": "hand_position",
+      "text": "Place the heel of one hand on the center of the chest, other hand on top, arms straight.",
+      "spoken": "Put the heel of one hand on the center of the chest, other hand on top, arms straight.",
+      "observable_action": "hands_on_sternum",
+      "needs_confirmation": true
+    },
+    {
+      "id": "compressions",
+      "text": "Push hard and fast, at least 2 inches (5 cm) deep, 100-120 compressions per minute. Let the chest fully recoil.",
+      "spoken": "Push hard and fast in the center of the chest. Follow the beat. Let the chest rise fully each time.",
+      "observable_action": "chest_compressions",
+      "needs_confirmation": false
+    },
+    {
+      "id": "aed",
+      "text": "When an AED arrives, turn it on and follow its voice prompts.",
+      "spoken": "When the defibrillator arrives, turn it on and follow its instructions.",
+      "observable_action": null,
+      "needs_confirmation": false
+    },
+    {
+      "id": "continue",
+      "text": "Continue until the person responds, an AED advises otherwise, or responders take over.",
+      "spoken": "Keep going until help arrives or the person starts moving.",
+      "observable_action": null,
+      "needs_confirmation": false
+    }
+  ],
+  "reviewed_by": "PENDING_MEDICAL_REVIEW",
+  "source": "AHA/Red Cross adult hands-only CPR guidance (to be verified by reviewer)"
+}

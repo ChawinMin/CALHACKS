@@ -1,0 +1,41 @@
+{
+  "id": "unknown_emergency",
+  "title": "Unclassified emergency (safe default)",
+  "priority": 4,
+  "escalate_to_emergency_services": true,
+  "dispatcher_summary": "Emergency of unclear nature; assessing responsiveness and breathing.",
+  "clarifying_question": "Can you describe what happened and what you see?",
+  "trigger_signs": {},
+  "steps": [
+    {
+      "id": "safety",
+      "text": "Make sure the area is safe for you and the person.",
+      "spoken": "First, make sure the area is safe.",
+      "observable_action": null,
+      "needs_confirmation": true
+    },
+    {
+      "id": "call_911",
+      "text": "Call emergency services and describe what you see.",
+      "spoken": "Call 911 and tell them what you see.",
+      "observable_action": null,
+      "needs_confirmation": true
+    },
+    {
+      "id": "check_response",
+      "text": "Check if the person responds and is breathing normally.",
+      "spoken": "Check if they respond and are breathing normally.",
+      "observable_action": null,
+      "needs_confirmation": true
+    },
+    {
+      "id": "follow_dispatcher",
+      "text": "Follow the dispatcher's instructions. If not breathing normally, begin CPR.",
+      "spoken": "Follow the dispatcher's instructions. If they are not breathing normally, start CPR.",
+      "observable_action": null,
+      "needs_confirmation": false
+    }
+  ],
+  "reviewed_by": "PENDING_MEDICAL_REVIEW",
+  "source": "General first-aid practice (to be verified by reviewer)"
+}

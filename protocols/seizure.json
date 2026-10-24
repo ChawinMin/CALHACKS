@@ -1,0 +1,54 @@
+{
+  "id": "seizure",
+  "title": "Seizure",
+  "priority": 3,
+  "escalate_to_emergency_services": true,
+  "dispatcher_summary": "Person having a seizure; protected from injury, timing the seizure.",
+  "clarifying_question": "Is the person shaking or convulsing, and do they have a history of seizures?",
+  "trigger_signs": {
+    "convulsions": 0.9,
+    "jerking_movements": 0.7,
+    "staring_unresponsive": 0.3,
+    "loss_of_consciousness": 0.2,
+    "seizure_history": 0.2
+  },
+  "steps": [
+    {
+      "id": "time",
+      "text": "Note the time the seizure started.",
+      "spoken": "Note the time the seizure started.",
+      "observable_action": null,
+      "needs_confirmation": true
+    },
+    {
+      "id": "clear",
+      "text": "Move hard or sharp objects away. Do not restrain the person. Cushion their head.",
+      "spoken": "Move hard objects away and cushion their head. Do not hold them down.",
+      "observable_action": null,
+      "needs_confirmation": true
+    },
+    {
+      "id": "nothing_mouth",
+      "text": "Never put anything in their mouth.",
+      "spoken": "Do not put anything in their mouth.",
+      "observable_action": null,
+      "needs_confirmation": false
+    },
+    {
+      "id": "call_911",
+      "text": "Call emergency services if the seizure lasts over 5 minutes, repeats, they are injured, not breathing afterwards, or it is their first seizure.",
+      "spoken": "Call 911 if it lasts more than five minutes, or if they are hurt or not waking up.",
+      "observable_action": null,
+      "needs_confirmation": true
+    },
+    {
+      "id": "recovery",
+      "text": "When shaking stops, roll them onto their side (recovery position), check breathing, and stay with them.",
+      "spoken": "When it stops, roll them onto their side and check they are breathing. Stay with them.",
+      "observable_action": "recovery_position",
+      "needs_confirmation": true
+    }
+  ],
+  "reviewed_by": "PENDING_MEDICAL_REVIEW",
+  "source": "Epilepsy Foundation first-aid guidance (to be verified by reviewer)"
+}
