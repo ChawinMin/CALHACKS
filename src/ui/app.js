@@ -15,15 +15,16 @@
 
   const $ = (id) => document.getElementById(id);
   const el = {
-    bench: $("bench"), lens: $("lens"), scene: $("scene"), cam: $("cam"), camImg: $("camImg"),
-    overlay: $("overlay"), hud: $("hud"), home: $("home"), homeGrid: $("homeGrid"), homeCall: $("homeCall"),
-    stepDots: $("stepDots"), elapsed: $("elapsed"), speakInd: $("speakInd"),
-    stepCard: $("stepCard"), stepKicker: $("stepKicker"), stepTitle: $("stepTitle"), stepDetail: $("stepDetail"), checklist: $("checklist"),
+    bench: $("bench"), lens: $("lens"), scene: $("scene"), cam: $("cam"), camImg: null,
+    overlay: $("overlay"), hud: $("hud"), home: $("home"), homeCall: $("homeCall"), homeCallLabel: $("homeCallLabel"),
+    startGuide: $("startGuide"), roadmapList: $("roadmapList"),
+    stepDots: $("stepDots"), stepCount: $("stepCount"), elapsed: $("elapsed"), speakInd: $("speakInd"),
+    stepCard: $("stepCard"), stepTitle: $("stepTitle"), stepDetail: $("stepDetail"), checklist: $("checklist"),
     badge911: $("badge911"), badge911Text: $("badge911Text"),
     ring: $("ring"), ringFill: $("ringFill"), ringTime: $("ringTime"), ringSub: $("ringSub"),
     warning: $("warning"), warningText: $("warningText"), kit: $("kit"),
     summary: $("summary"), summaryList: $("summaryList"),
-    hudBack: $("hudBack"), hudNext: $("hudNext"),
+    hudBack: $("hudBack"), hudNext: $("hudNext"), hudNextLabel: $("hudNextLabel"),
     stepList: $("stepList"), backBtn: $("backBtn"), nextBtn: $("nextBtn"), log: $("log"),
     sourcePill: $("sourcePill"), wsPill: $("wsPill"), sourceHint: $("sourceHint"),
     optAuto: $("optAuto"), optVoice: $("optVoice"), optAutoplay: $("optAutoplay"), optSpeed: $("optSpeed"),
@@ -184,7 +185,7 @@
   // Map a box in camera-frame coordinates to lens viewBox px, honouring object-fit: cover.
   function frameToLens(box) {
     let { x, y, w, h } = Array.isArray(box) ? { x: box[0], y: box[1], w: box[2], h: box[3] } : box;
-    const media = !el.cam.hidden ? el.cam : !el.camImg.hidden ? el.camImg : null;
+    const media = !el.cam.hidden ? el.cam : el.camImg && !el.camImg.hidden ? el.camImg : null;
     const fw = media ? (media.videoWidth || media.naturalWidth || VW) : VW;
     const fh = media ? (media.videoHeight || media.naturalHeight || VH) : VH;
     const isNorm = [x, y, w, h].every((v) => v >= 0 && v <= 1.0001);
@@ -305,13 +306,18 @@
 
   function attachStream(src) {
     if (src == null) { setSource("sim"); return; }
-    el.cam.hidden = true; el.camImg.hidden = true;
+    el.cam.hidden = true;
+    if (el.camImg) el.camImg.hidden = true;
     if (src instanceof MediaStream) {
       el.cam.srcObject = src; el.cam.hidden = false; el.cam.play().catch(() => {});
     } else if (src instanceof HTMLVideoElement && src.srcObject) {
       el.cam.srcObject = src.srcObject; el.cam.hidden = false; el.cam.play().catch(() => {});
     } else if (typeof src === "string") {
       // MJPEG / snapshot URL from the Python side, e.g. http://localhost:5000/video
+      if (!el.camImg) {
+        el.camImg = Object.assign(document.createElement("img"), { className: "cam", alt: "Live camera view" });
+        el.cam.after(el.camImg);
+      }
       el.camImg.src = src; el.camImg.hidden = false;
     } else { console.warn("VisionER.attachStream: unsupported source", src); return; }
     S.source = "camera";
@@ -336,7 +342,7 @@
   // ---------------------------------------------------------------- render
   function currentCopy() {
     const st = STEPS[S.step];
-    if (S.step === 3 && S.soak) return { kicker: `Step 4 of ${STEPS.length} · add gauze`, ...P.soak, cls: "is-alert" };
+    if (S.step === 3 && S.soak) return { kicker: `Step 4 of ${STEPS.length}`, ...P.soak, cls: "is-alert" };
     if (S.step === STEPS.length - 1 && S.phase === "stay") return { kicker: "Until EMS arrives", ...P.stay, cls: "is-done" };
     return { kicker: `Step ${S.step + 1} of ${STEPS.length}`, title: st.title, detail: st.detail, cls: "" };
   }
@@ -348,14 +354,13 @@
 
     // home
     if (!guide) {
-      el.homeCall.innerHTML = S.det.call911
-        ? "✓ 911 called. Pick the emergency"
-        : el.homeCall.dataset.label;
+      el.homeCallLabel.textContent = S.det.call911 ? "911 called. Now pick the emergency" : "Not sure? Call 911 first";
+      el.homeCall.classList.toggle("is-done", S.det.call911);
     }
 
     if (guide) {
       const c = currentCopy();
-      el.stepKicker.textContent = c.kicker;
+      el.stepCount.textContent = c.kicker;
       el.stepTitle.textContent = c.title;
       el.stepDetail.textContent = c.detail;
       el.stepCard.className = `step-card ${c.cls}`;
@@ -368,7 +373,7 @@
       });
 
       el.badge911.dataset.state = S.det.call911 ? "done" : "pending";
-      el.badge911Text.textContent = S.det.call911 ? `911 · called ${fmt(S.t.call911 || 0)}` : "911 · not called";
+      el.badge911Text.textContent = S.det.call911 ? `911 called at ${fmt(S.t.call911 || 0)}` : "911 not called";
 
       // warning banner
       let warn = "";
@@ -385,7 +390,7 @@
       el.hudBack.disabled = false;
       const last = S.step === STEPS.length - 1;
       el.hudNext.disabled = last && S.phase === "stay";
-      el.hudNext.textContent = last ? (S.phase === "stay" ? "Done" : "Bandage on ›") : "Next ›";
+      el.hudNextLabel.textContent = last ? (S.phase === "stay" ? "Done" : "Bandage on") : "Next";
     }
 
     // kit chips
@@ -402,7 +407,7 @@
       li.className = !guide ? "" : i < S.step || (i === S.step && S.phase === "stay") ? "done" : i === S.step ? "now" : "";
     });
     el.backBtn.disabled = !guide;
-    el.nextBtn.textContent = !guide ? "Start ›" : el.hudNext.textContent;
+    el.nextBtn.textContent = !guide ? "Start" : el.hudNextLabel.textContent;
     el.nextBtn.disabled = guide && el.hudNext.disabled;
     document.querySelectorAll(".det").forEach((b) => {
       const k = b.dataset.det;
@@ -489,7 +494,7 @@
   function ghostHand(s, dx, dy) {
     const f = (x, h, w = 30) => `<rect x="${x}" y="${-40 - h}" width="${w}" height="${h + 20}" rx="${w / 2}"/>`;
     return `<g transform="translate(${dx} ${dy}) scale(${s})">
-      <g class="holo-fill" style="fill: rgba(111,233,255,.10)">
+      <g class="holo-fill holo-faint">
         ${f(-62, 78)}${f(-28, 100)}${f(6, 92)}${f(40, 70, 28)}
         <rect x="-70" y="-50" width="140" height="130" rx="40"/>
         <rect x="-118" y="-6" width="30" height="92" rx="15" transform="rotate(-38 -103 40)"/>
@@ -504,7 +509,7 @@
         <g class="scanline"><rect x="0" y="-120" width="${VW}" height="120" fill="url(#scanGrad)"/><rect x="0" y="-3" width="${VW}" height="3" fill="#6fe9ff" opacity=".9"/></g>
         <g transform="translate(${VW / 2} ${VH / 2 + 40})">${brackets(330, 190, 46)}
           ${label("SCANNING FOR BLEEDING", -220)}
-          <text class="holo-text" x="0" y="250" text-anchor="middle" style="font-size:18px;opacity:.8">LOOK AT THE INJURED LIMB · HOLD STILL</text></g>`;
+          <text class="holo-text holo-sub" x="0" y="250" text-anchor="middle">LOOK AT THE INJURED LIMB · HOLD STILL</text></g>`;
     }
     if (!t) return "";
     const hw = t.w / 2, hh = t.h / 2;
@@ -525,7 +530,7 @@
         const gw = hw + 18, gh = hh + 18;
         body = `<ellipse class="holo-stroke holo-dash" rx="${hw}" ry="${hh}" opacity=".7"/>
           <g class="holo-drop"><rect class="holo-fill" x="${-gw}" y="${-gh}" width="${gw * 2}" height="${gh * 2}" rx="12"/>
-            <path class="holo-stroke" style="stroke-width:1.5;opacity:.6" d="${Array.from({ length: 5 }, (_, i) => `M${-gw + (i + 1) * (gw * 2) / 6} ${-gh} V${gh}`).join(" ")} M${-gw} 0 H${gw}"/></g>
+            <path class="holo-stroke holo-hair" d="${Array.from({ length: 5 }, (_, i) => `M${-gw + (i + 1) * (gw * 2) / 6} ${-gh} V${gh}`).join(" ")} M${-gw} 0 H${gw}"/></g>
           ${arrowDown(0, -(gh + 30))}${label("PLACE GAUZE HERE", -(gh + 100))}`;
         break;
       }
@@ -533,7 +538,7 @@
       case "released": {
         const s = Math.max(0.55, Math.min(1.4, (t.w + 40) / 260));
         const warn = kind === "released";
-        body = `<rect class="${warn ? "holo-warnfill" : "holo-fill"}" style="${warn ? "" : "fill:rgba(111,233,255,.06)"}" x="${-hw - 18}" y="${-hh - 18}" width="${t.w + 36}" height="${t.h + 36}" rx="12"/>
+        body = `<rect class="${warn ? "holo-warnfill" : "holo-fill holo-faint"}" x="${-hw - 18}" y="${-hh - 18}" width="${t.w + 36}" height="${t.h + 36}" rx="12"/>
           <g class="holo-push">${ghostHand(s, -10 * s, 10 * s)}${ghostHand(s, 10 * s, -14 * s)}</g>
           ${arrowDown(-hw - 70, 0, warn ? "holo-stroke holo-warnfill" : "holo-stroke")}${arrowDown(hw + 70, 0, warn ? "holo-stroke holo-warnfill" : "holo-stroke")}
           ${label(warn ? "PRESS DOWN · DON’T LIFT" : "PRESS HARD · BOTH HANDS", -(hh + 150 * s), warn ? "holo-text holo-warntext" : "holo-text")}`;
@@ -556,9 +561,8 @@
         break;
       }
       case "stay":
-        body = `<ellipse rx="${hw + 30}" ry="${hh + 20}" style="fill:rgba(94,224,143,.08);stroke:#5ee08f;stroke-width:3" class="holo-pulse"/>
-          ${label("KEEP PRESSURE · WAIT FOR EMS", hh + 64, "holo-text")}`;
-        body = body.replace('class="holo-text"', 'class="holo-text" style="fill:#5ee08f"');
+        // The step card already says "Stay with them"; the hologram only marks the dressing.
+        body = `<ellipse rx="${hw + 30}" ry="${hh + 20}" class="holo-okfill"/>`;
         break;
     }
     return `<g id="anchor">${body}</g>`;
@@ -707,7 +711,7 @@
       const s = el.cam.srcObject;
       if (s && s.getTracks) s.getTracks().forEach((t) => t.stop());
       el.cam.srcObject = null; el.cam.hidden = true;
-      el.camImg.removeAttribute("src"); el.camImg.hidden = true;
+      if (el.camImg) { el.camImg.remove(); el.camImg = null; }
       el.scene.style.visibility = "";
       S.source = "sim";
     }
@@ -747,25 +751,14 @@
 
   // ---------------------------------------------------------------- build static UI
   function buildStatic() {
-    el.homeCall.dataset.label = el.homeCall.innerHTML;
-    el.homeGrid.innerHTML = DATA.EMERGENCIES.map((e) => `
-      <button type="button" class="em-card ${e.live ? "live" : ""}" data-em="${e.id}" ${e.live ? "" : 'aria-disabled="true"'} title="${e.shows}">
-        <span class="em-title">${e.title}</span>
-        <span class="em-sub">${e.sub}</span>
-        <span class="em-tag">${e.live ? "Start guide" : "Roadmap"}</span>
-      </button>`).join("");
+    el.roadmapList.textContent = DATA.EMERGENCIES.filter((e) => !e.live).map((e) => e.title === "AED use" ? "AED" : e.title).join(", ");
     el.stepDots.innerHTML = STEPS.map(() => "<li></li>").join("");
     el.kit.innerHTML = DATA.KIT.map((k) => `<li data-id="${k.id}">${k.label}</li>`).join("");
     el.stepList.innerHTML = STEPS.map((s) => `<li><span class="t">${s.title}</span><span class="a">${s.advanceOn}</span></li>`).join("");
   }
 
   function bind() {
-    el.homeGrid.addEventListener("click", (e) => {
-      const card = e.target.closest(".em-card");
-      if (!card) return;
-      if (card.classList.contains("live")) start();
-      else { const em = DATA.EMERGENCIES.find((x) => x.id === card.dataset.em); speak(`${em.title} guidance is coming soon. Call 9 1 1.`); log("roadmap", em.id); }
-    });
+    el.startGuide.addEventListener("click", start);
     el.homeCall.addEventListener("click", () => { mark911(); speak("Call 9 1 1 now. Then pick the emergency."); renderAll(); });
     el.checklist.addEventListener("click", (e) => { if (e.target.dataset.act === "call911") setDetected("call911", true); });
     el.hudNext.addEventListener("click", next);

@@ -3,21 +3,23 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b0d10" />
+  <meta name="color-scheme" content="dark" />
   <title>VisionER · AR first aid</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@500;700&family=Atkinson+Hyperlegible+Next:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header class="topbar">
     <div class="brand">
       <span class="brand-mark" aria-hidden="true"></span>
-      <span class="brand-name">Vision<b>ER</b></span>
+      <span class="brand-name" translate="no">Vision<b>ER</b></span>
       <span class="brand-tag">AR first aid · Cal Hacks simulation</span>
     </div>
     <div class="topbar-right">
-      <span class="pill" id="sourcePill">Simulated scene</span>
+      <span class="pill" id="sourcePill" aria-live="polite">Simulated scene</span>
       <span class="pill" id="wsPill" hidden>WS</span>
       <button class="ghost-btn" id="consoleToggle" aria-pressed="true" title="Toggle operator console (C)">Console</button>
     </div>
@@ -88,18 +90,20 @@
           </svg>
 
           <video class="cam" id="cam" autoplay playsinline muted hidden></video>
-          <img class="cam" id="camImg" alt="" hidden />
-
+          
           <!-- Layer 2: holograms anchored to the target. Drawn by app.js. -->
           <svg class="overlay" id="overlay" viewBox="0 0 1600 900" preserveAspectRatio="none"></svg>
 
           <!-- Layer 3: HUD -->
           <div class="hud" id="hud" hidden>
             <div class="hud-top">
-              <span class="hud-brand">VISION<b>ER</b></span>
-              <ol class="step-dots" id="stepDots" aria-label="Progress"></ol>
+              <span class="hud-brand" translate="no">Vision<b>ER</b></span>
+              <div class="progress">
+                <ol class="step-dots" id="stepDots" aria-hidden="true"></ol>
+                <span class="step-count" id="stepCount">Step 1 of 5</span>
+              </div>
               <span class="hud-clock">
-                <span class="rec" aria-hidden="true"></span>
+                <span class="sr-only">Time on scene</span>
                 <span id="elapsed">00:00</span>
                 <span class="speak-ind" id="speakInd" title="Read-aloud">
                   <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path class="w1" d="M16 9a4 4 0 0 1 0 6" stroke="currentColor" stroke-width="2" fill="none"/><path class="w2" d="M18.5 6.5a7.5 7.5 0 0 1 0 11" stroke="currentColor" stroke-width="2" fill="none"/></svg>
@@ -107,8 +111,7 @@
               </span>
             </div>
 
-            <div class="step-card" id="stepCard">
-              <div class="step-kicker" id="stepKicker">Step 1 of 5</div>
+            <div class="step-card" id="stepCard" aria-live="polite">
               <h2 class="step-title" id="stepTitle">Put on gloves. Call 911.</h2>
               <p class="step-detail" id="stepDetail"></p>
               <ul class="checklist" id="checklist"></ul>
@@ -116,7 +119,7 @@
 
             <div class="side-stack">
               <div class="badge-911" id="badge911" data-state="pending">
-                <span class="dot"></span><span id="badge911Text">911 · not called</span>
+                <svg class="phone" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1L6.6 10.8z" fill="currentColor"/></svg><span id="badge911Text">911 not called</span>
               </div>
               <div class="ring" id="ring" hidden>
                 <svg viewBox="0 0 120 120" aria-hidden="true">
@@ -130,7 +133,7 @@
               </div>
             </div>
 
-            <div class="warning" id="warning" hidden>
+            <div class="warning" id="warning" role="status" hidden>
               <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 3 2 21h20L12 3z" fill="currentColor"/><path d="M12 10v5M12 17.5v.5" stroke="#1a1204" stroke-width="2.4" stroke-linecap="round"/></svg>
               <span id="warningText"></span>
             </div>
@@ -138,26 +141,30 @@
             <ul class="kit" id="kit" aria-label="Kit items detected"></ul>
 
             <div class="summary" id="summary" hidden>
-              <div class="summary-head">EMS handoff</div>
+              <h2 class="summary-title">EMS handoff</h2>
               <dl id="summaryList"></dl>
             </div>
 
             <div class="nav-hint">
-              <button class="hud-btn" id="hudBack" aria-label="Previous step">‹</button>
-              <button class="hud-btn primary" id="hudNext">Next ›</button>
+              <button class="hud-btn" id="hudBack" aria-label="Previous step"><svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+              <button class="hud-btn primary" id="hudNext"><span id="hudNextLabel">Next</span><svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
             </div>
           </div>
 
           <!-- Home: choose the emergency -->
           <div class="home" id="home">
             <div class="home-inner">
-              <div class="home-kicker">VisionER is on</div>
               <h1 class="home-title">What’s the emergency?</h1>
-              <div class="home-grid" id="homeGrid"></div>
-              <button class="call-911" id="homeCall">
-                <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1L6.6 10.8z" fill="currentColor"/></svg>
-                Not sure? Call 911 first
+              <button type="button" class="start-guide" id="startGuide">
+                <span class="start-main">Severe bleeding</span>
+                <span class="start-sub">Arm or leg wound · uses gloves and gauze from the kit</span>
+                <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
               </button>
+              <button type="button" class="call-911" id="homeCall">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1L6.6 10.8z" fill="currentColor"/></svg>
+                <span id="homeCallLabel">Not sure? Call 911 first</span>
+              </button>
+              <p class="roadmap">Coming next: <span id="roadmapList"></span></p>
             </div>
           </div>
 
@@ -165,12 +172,12 @@
         </div>
         <div class="bridge" aria-hidden="true"></div>
       </div>
-      <p class="caption">Laptop screen standing in for the glasses display. VisionER guides bystanders until EMS arrives. It does not diagnose and does not replace calling 911. Not yet clinician-reviewed.</p>
+      <p class="caption" id="caption">Laptop screen standing in for the glasses display. VisionER guides bystanders until EMS arrives. It does not diagnose and does not replace calling 911. Not yet clinician-reviewed.</p>
     </section>
 
     <aside class="console" id="console" aria-label="Operator console">
       <section class="panel">
-        <h3>Source</h3>
+        <h2>Source</h2>
         <div class="seg" role="group" aria-label="Video source">
           <button class="seg-btn is-on" data-source="sim">Simulated</button>
           <button class="seg-btn" data-source="webcam">Webcam</button>
@@ -179,16 +186,16 @@
       </section>
 
       <section class="panel">
-        <h3>Steps</h3>
+        <h2>Steps</h2>
         <ol class="step-list" id="stepList"></ol>
         <div class="row">
-          <button class="btn" id="backBtn">‹ Back</button>
-          <button class="btn primary" id="nextBtn">Next ›</button>
+          <button class="btn" id="backBtn">Back</button>
+          <button class="btn primary" id="nextBtn">Next</button>
         </div>
       </section>
 
       <section class="panel">
-        <h3>Simulate detections</h3>
+        <h2>Simulate detections</h2>
         <div class="det-grid">
           <button class="btn det" data-det="gloves">Gloves on</button>
           <button class="btn det" data-det="call911">911 called</button>
@@ -206,7 +213,7 @@
       </section>
 
       <section class="panel">
-        <h3>Demo</h3>
+        <h2>Demo</h2>
         <label class="toggle"><input type="checkbox" id="optAuto" checked /> <span>Auto-advance on detection</span></label>
         <label class="toggle"><input type="checkbox" id="optVoice" checked /> <span>Read aloud</span></label>
         <label class="toggle"><input type="checkbox" id="optAutoplay" /> <span>Autoplay vision (sim)</span></label>
@@ -225,7 +232,7 @@
       </section>
 
       <section class="panel">
-        <h3>Vision hooks <code>window.VisionER</code></h3>
+        <h2>Hook log <code translate="no">window.VisionER</code></h2>
         <ol class="log" id="log"></ol>
       </section>
     </aside>
