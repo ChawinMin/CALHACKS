@@ -38,8 +38,9 @@
   --t-fast: 120ms;
   --t-med: 260ms;
 
-  --sans: "Atkinson Hyperlegible Next", system-ui, sans-serif;
-  --mono: "Atkinson Hyperlegible Mono", ui-monospace, Consolas, monospace;
+  /* One family everywhere. Timers and logs use its tabular figures instead of a mono face. */
+  --sans: "Google Sans", system-ui, sans-serif;
+  --mono: var(--sans);
 }
 
 * { box-sizing: border-box; }
@@ -111,7 +112,7 @@ h1, h2 { text-wrap: balance; }
   position: relative;
   padding: 14px;
   border-radius: 40px;
-  background: linear-gradient(180deg, #23272e, #121418);
+  background: #1a1d22;
   box-shadow: 0 0 0 1px #2e333b, 0 24px 60px rgba(0, 0, 0, .55), inset 0 1px 0 rgba(255,255,255,.06);
   max-width: calc((100dvh - 170px) * 16 / 9 + 28px);
   min-width: min(100%, 520px);
@@ -128,12 +129,6 @@ h1, h2 { text-wrap: balance; }
   container-type: inline-size;
   touch-action: none;
   user-select: none;
-}
-.lens-glare {
-  position: absolute; inset: 0; pointer-events: none;
-  background:
-    radial-gradient(120% 90% at 50% 50%, transparent 62%, rgba(0,0,0,.55) 100%),
-    linear-gradient(115deg, rgba(255,255,255,.06) 0%, transparent 28%);
 }
 .scene, .cam, .overlay { position: absolute; inset: 0; width: 100%; height: 100%; }
 .cam { object-fit: cover; }
@@ -291,7 +286,7 @@ h1, h2 { text-wrap: balance; }
 /* ---------- home ---------- */
 .home {
   position: absolute; inset: 0; display: grid; place-items: center; overflow: auto;
-  background: radial-gradient(90% 90% at 50% 40%, rgba(6,10,14,.7), rgba(6,10,14,.94));
+  background: rgba(6, 10, 14, 0.88);
   font-size: clamp(11px, 1.4cqi, 18px);
 }
 .home-inner { width: min(88%, 34em); display: flex; flex-direction: column; align-items: stretch; gap: .8em; }

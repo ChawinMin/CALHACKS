@@ -8,7 +8,7 @@
   <title>VisionER · AR first aid</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@500;700&family=Atkinson+Hyperlegible+Next:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -20,7 +20,6 @@
     </div>
     <div class="topbar-right">
       <span class="pill" id="sourcePill" aria-live="polite">Simulated scene</span>
-      <span class="pill" id="wsPill" hidden>WS</span>
       <button class="ghost-btn" id="consoleToggle" aria-pressed="true" title="Toggle operator console (C)">Console</button>
     </div>
   </header>
@@ -32,43 +31,25 @@
           <!-- Layer 1: what the wearer sees. Simulated scene or camera. -->
           <svg class="scene" id="scene" viewBox="0 0 1600 900" preserveAspectRatio="none" aria-hidden="true">
             <defs>
-              <radialGradient id="floor" cx="50%" cy="60%" r="80%">
-                <stop offset="0" stop-color="#3a3530" />
-                <stop offset="1" stop-color="#14120f" />
-              </radialGradient>
-              <linearGradient id="skin" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stop-color="#d7a27d" />
-                <stop offset=".55" stop-color="#c38a65" />
-                <stop offset="1" stop-color="#9c6847" />
-              </linearGradient>
-              <linearGradient id="sleeve" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stop-color="#3f5a7a" />
-                <stop offset="1" stop-color="#253a52" />
-              </linearGradient>
-              <radialGradient id="blood" cx="50%" cy="50%" r="50%">
-                <stop offset="0" stop-color="#5e0508" />
-                <stop offset=".6" stop-color="#8f0d12" />
-                <stop offset="1" stop-color="#8f0d12" stop-opacity="0" />
-              </radialGradient>
               <pattern id="weave" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
                 <rect width="14" height="14" fill="#f4f1ea" />
                 <path d="M0 7h14M7 0v14" stroke="#dcd6ca" stroke-width="2" />
               </pattern>
             </defs>
-            <rect width="1600" height="900" fill="url(#floor)" />
+            <rect width="1600" height="900" fill="#26221e" />
             <g opacity=".18" stroke="#000" stroke-width="3">
               <path d="M0 260 L1600 180 M0 520 L1600 470 M0 800 L1600 770" />
             </g>
             <!-- forearm lying across the floor -->
-            <path d="M-20 470 C 200 440, 420 430, 560 440 L 560 640 C 420 650, 200 650, -20 640 Z" fill="url(#sleeve)" />
-            <path d="M540 445 C 760 450, 1000 470, 1180 492 C 1250 500, 1300 505, 1330 520 L 1330 610 C 1290 625, 1240 630, 1180 628 C 1000 632, 760 640, 540 640 Z" fill="url(#skin)" />
+            <path d="M-20 470 C 200 440, 420 430, 560 440 L 560 640 C 420 650, 200 650, -20 640 Z" fill="#33506f" />
+            <path d="M540 445 C 760 450, 1000 470, 1180 492 C 1250 500, 1300 505, 1330 520 L 1330 610 C 1290 625, 1240 630, 1180 628 C 1000 632, 760 640, 540 640 Z" fill="#c99272" />
             <!-- hand -->
-            <path d="M1320 512 C 1380 500, 1450 505, 1500 520 C 1560 535, 1580 560, 1555 578 C 1530 590, 1480 585, 1440 600 C 1400 620, 1350 625, 1320 612 Z" fill="url(#skin)" />
+            <path d="M1320 512 C 1380 500, 1450 505, 1500 520 C 1560 535, 1580 560, 1555 578 C 1530 590, 1480 585, 1440 600 C 1400 620, 1350 625, 1320 612 Z" fill="#c99272" />
             <path d="M1440 548 C 1480 545, 1520 552, 1545 565" stroke="#8d5d40" stroke-width="3" fill="none" opacity=".5" />
             <path d="M560 452 C 760 458, 1000 476, 1180 498" stroke="#f0c3a0" stroke-width="6" fill="none" opacity=".35" />
             <!-- wound + blood -->
             <g id="simWound">
-              <ellipse cx="900" cy="560" rx="150" ry="70" fill="url(#blood)" opacity=".85" />
+              <ellipse cx="900" cy="560" rx="120" ry="52" fill="#8f0d12" opacity=".8" />
               <path d="M820 552 C 860 540, 940 538, 985 556 C 950 572, 870 574, 820 552 Z" fill="#3d0204" />
               <path d="M830 600 C 828 640, 840 690, 836 720" stroke="#7d0a0e" stroke-width="10" stroke-linecap="round" fill="none" />
               <ellipse cx="840" cy="735" rx="42" ry="14" fill="#6b0709" opacity=".9" />
@@ -168,7 +149,6 @@
             </div>
           </div>
 
-          <div class="lens-glare" aria-hidden="true"></div>
         </div>
         <div class="bridge" aria-hidden="true"></div>
       </div>

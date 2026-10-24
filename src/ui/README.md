@@ -2,13 +2,13 @@
 
 The AR glasses view for the Cal Hacks demo: **controlling bleeding from a limb wound with gauze**, five steps, end to end. The laptop screen stands in for the glasses display. The other emergencies are shown on the home screen as roadmap and are not functional.
 
-No build step. Plain HTML/CSS/JS.
+No backend and no build step: plain HTML, CSS and JS that run entirely in the browser. Open `src/ui/index.html` directly, or serve the folder with any static file server if you prefer a localhost URL:
 
 ```bash
 python -m http.server 5173 --directory src/ui
 ```
 
-Then open http://localhost:5173.
+The only network request is the Google Sans font from Google Fonts; without internet it falls back to the system sans.
 
 ## What's on screen
 
@@ -23,7 +23,7 @@ Every step can be advanced by hand (**Next**, → or Space), so the demo still r
 
 Keys: `→`/`Space` next · `←` back · `C` toggle console · `H` home · `S` repeat the last spoken line.
 
-URL options: `?autoplay=1` (simulated vision runs the whole flow), `?console=0`, `?ws=ws://localhost:8765`, `?stream=http://localhost:5000/video`.
+URL options: `?autoplay=1` (simulated vision runs the whole flow), `?console=0`.
 
 ## Steps and what advances them
 
@@ -42,7 +42,7 @@ Step text lives in [`protocol.js`](protocol.js). It follows AHA lay-rescuer / St
 ## Vision hooks: `window.VisionER`
 
 ```js
-VisionER.attachStream(src)      // MediaStream, or an MJPEG/snapshot URL string. null = back to simulated scene
+VisionER.attachStream(stream)   // a MediaStream (e.g. from getUserMedia). null = back to simulated scene
 VisionER.setTarget(box, conf?)  // {x, y, w, h} of the wound in the camera frame. null clears it
 VisionER.setDetected(label, value = true, conf?)
 VisionER.goTo(step)             // step id ("press-hold"), 1-based number (4), "stay" or "home"
@@ -53,15 +53,4 @@ VisionER.state                  // current step, target, detections, hold time
 - `box` can be normalized (0–1) or pixels in the camera frame; arrays `[x, y, w, h]` work too. The UI handles the crop from `object-fit: cover`, so send raw frame coordinates.
 - Labels: `gloves`, `call911`, `wound`, `gauze`, `trauma_pad`, `bandage`, `soak`, `pressure`. Case, spaces and dashes don't matter.
 
-### From Python (WebSocket)
-
-Open the UI with `?ws=ws://localhost:8765` and send JSON:
-
-```json
-{"type": "target",   "box": {"x": 0.48, "y": 0.55, "w": 0.13, "h": 0.12}, "confidence": 0.91}
-{"type": "detected", "label": "gauze", "value": true, "confidence": 0.88}
-{"type": "goTo",     "step": "press-hold"}
-{"type": "stream",   "url": "http://localhost:5000/video"}
-```
-
-The UI sends back `{"type": "step", "step": 3, "id": "place-gauze"}` on every step change. It reconnects every 2 s if the socket drops. A minimal server is in [`src/integration/ws_bridge_example.py`](../integration/ws_bridge_example.py).
+Detection runs in the browser too: call the hooks from the same page, e.g. a MediaPipe or TensorFlow.js model reading `document.getElementById("cam")`. There is no server to send detections to.

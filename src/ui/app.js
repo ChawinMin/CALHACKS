@@ -15,7 +15,7 @@
 
   const $ = (id) => document.getElementById(id);
   const el = {
-    bench: $("bench"), lens: $("lens"), scene: $("scene"), cam: $("cam"), camImg: null,
+    bench: $("bench"), lens: $("lens"), scene: $("scene"), cam: $("cam"),
     overlay: $("overlay"), hud: $("hud"), home: $("home"), homeCall: $("homeCall"), homeCallLabel: $("homeCallLabel"),
     startGuide: $("startGuide"), roadmapList: $("roadmapList"),
     stepDots: $("stepDots"), stepCount: $("stepCount"), elapsed: $("elapsed"), speakInd: $("speakInd"),
@@ -26,7 +26,7 @@
     summary: $("summary"), summaryList: $("summaryList"),
     hudBack: $("hudBack"), hudNext: $("hudNext"), hudNextLabel: $("hudNextLabel"),
     stepList: $("stepList"), backBtn: $("backBtn"), nextBtn: $("nextBtn"), log: $("log"),
-    sourcePill: $("sourcePill"), wsPill: $("wsPill"), sourceHint: $("sourceHint"),
+    sourcePill: $("sourcePill"), sourceHint: $("sourceHint"),
     optAuto: $("optAuto"), optVoice: $("optVoice"), optAutoplay: $("optAutoplay"), optSpeed: $("optSpeed"),
     simGauze: $("simGauze"), simGauze2: $("simGauze2"), simSoak: $("simSoak"), simBandage: $("simBandage"),
   };
@@ -135,7 +135,6 @@
     renderAll(true);
     speak(STEPS[i].speak);
     stepListeners.forEach((cb) => { try { cb(i + 1, STEPS[i].id); } catch (e) { console.error(e); } });
-    wsSend({ type: "step", step: i + 1, id: STEPS[i].id });
     log("step", `${i + 1} ${STEPS[i].id}`);
     scheduleAutoplay();
   }
@@ -162,7 +161,6 @@
     S.phase = "stay";
     renderAll(true);
     speak(P.stay.speak);
-    wsSend({ type: "step", step: STEPS.length, id: "stay" });
     log("phase", "stay with patient");
   }
 
@@ -185,9 +183,9 @@
   // Map a box in camera-frame coordinates to lens viewBox px, honouring object-fit: cover.
   function frameToLens(box) {
     let { x, y, w, h } = Array.isArray(box) ? { x: box[0], y: box[1], w: box[2], h: box[3] } : box;
-    const media = !el.cam.hidden ? el.cam : el.camImg && !el.camImg.hidden ? el.camImg : null;
-    const fw = media ? (media.videoWidth || media.naturalWidth || VW) : VW;
-    const fh = media ? (media.videoHeight || media.naturalHeight || VH) : VH;
+    const media = !el.cam.hidden ? el.cam : null;
+    const fw = media ? (media.videoWidth || VW) : VW;
+    const fh = media ? (media.videoHeight || VH) : VH;
     const isNorm = [x, y, w, h].every((v) => v >= 0 && v <= 1.0001);
     if (isNorm) { x *= fw; y *= fh; w *= fw; h *= fh; }
     if (!media) return { x, y, w, h };
@@ -304,27 +302,17 @@
     if (step === "stay") finishWrap();
   }
 
+  // Everything runs in the browser: the stream is a MediaStream (webcam) or a <video> that has one.
   function attachStream(src) {
     if (src == null) { setSource("sim"); return; }
-    el.cam.hidden = true;
-    if (el.camImg) el.camImg.hidden = true;
-    if (src instanceof MediaStream) {
-      el.cam.srcObject = src; el.cam.hidden = false; el.cam.play().catch(() => {});
-    } else if (src instanceof HTMLVideoElement && src.srcObject) {
-      el.cam.srcObject = src.srcObject; el.cam.hidden = false; el.cam.play().catch(() => {});
-    } else if (typeof src === "string") {
-      // MJPEG / snapshot URL from the Python side, e.g. http://localhost:5000/video
-      if (!el.camImg) {
-        el.camImg = Object.assign(document.createElement("img"), { className: "cam", alt: "Live camera view" });
-        el.cam.after(el.camImg);
-      }
-      el.camImg.src = src; el.camImg.hidden = false;
-    } else { console.warn("VisionER.attachStream: unsupported source", src); return; }
+    const stream = src instanceof MediaStream ? src : src instanceof HTMLVideoElement ? src.srcObject : null;
+    if (!stream) { console.warn("VisionER.attachStream: expected a MediaStream", src); return; }
+    el.cam.srcObject = stream; el.cam.hidden = false; el.cam.play().catch(() => {});
     S.source = "camera";
     el.scene.style.visibility = "hidden";
     opts.autoplay = el.optAutoplay.checked = false;
     syncSourceUI();
-    log("attachStream", typeof src === "string" ? src : "MediaStream");
+    log("attachStream", "MediaStream");
   }
 
   function onStep(cb) { if (typeof cb === "function") stepListeners.push(cb); }
@@ -504,9 +492,7 @@
   function buildOverlay(kind, t) {
     if (kind === "none") return "";
     if (kind === "scan") {
-      return `<defs><linearGradient id="scanGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#6fe9ff" stop-opacity="0"/><stop offset="1" stop-color="#6fe9ff" stop-opacity=".22"/></linearGradient></defs>
-        <g class="scanline"><rect x="0" y="-120" width="${VW}" height="120" fill="url(#scanGrad)"/><rect x="0" y="-3" width="${VW}" height="3" fill="#6fe9ff" opacity=".9"/></g>
+      return `<g class="scanline"><rect x="0" y="-3" width="${VW}" height="3" fill="#6fe9ff" opacity=".9"/></g>
         <g transform="translate(${VW / 2} ${VH / 2 + 40})">${brackets(330, 190, 46)}
           ${label("SCANNING FOR BLEEDING", -220)}
           <text class="holo-text holo-sub" x="0" y="250" text-anchor="middle">LOOK AT THE INJURED LIMB · HOLD STILL</text></g>`;
@@ -711,7 +697,6 @@
       const s = el.cam.srcObject;
       if (s && s.getTracks) s.getTracks().forEach((t) => t.stop());
       el.cam.srcObject = null; el.cam.hidden = true;
-      if (el.camImg) { el.camImg.remove(); el.camImg = null; }
       el.scene.style.visibility = "";
       S.source = "sim";
     }
@@ -727,26 +712,6 @@
     el.sourceHint.textContent = sim
       ? "Drag on the lens to place the wound target by hand, or turn on Autoplay to run the whole flow."
       : "Live camera. Vision team drives the overlay via setTarget / setDetected. Drag on the lens as a fallback.";
-  }
-
-  // ---------------------------------------------------------------- websocket bridge (optional)
-  // ?ws=ws://localhost:8765  messages: {type:"target", box:{x,y,w,h}, confidence}
-  //   {type:"detected", label, value, confidence}  {type:"goTo", step}  {type:"stream", url}
-  let ws = null;
-  function wsSend(msg) { if (ws && ws.readyState === 1) ws.send(JSON.stringify(msg)); }
-  function connectWs(url) {
-    el.wsPill.hidden = false;
-    el.wsPill.textContent = "WS · connecting";
-    ws = new WebSocket(url);
-    ws.onopen = () => { el.wsPill.textContent = "WS · live"; el.wsPill.classList.add("live"); log("ws", "open"); wsSend({ type: "hello", step: S.step + 1 }); };
-    ws.onclose = () => { el.wsPill.textContent = "WS · retrying"; el.wsPill.classList.remove("live"); setTimeout(() => connectWs(url), 2000); };
-    ws.onmessage = (ev) => {
-      let m; try { m = JSON.parse(ev.data); } catch { return; }
-      if (m.type === "target") setTarget(m.box ?? null, m.confidence);
-      else if (m.type === "detected") setDetected(m.label, m.value ?? true, m.confidence);
-      else if (m.type === "goTo") goTo(m.step);
-      else if (m.type === "stream") attachStream(m.url);
-    };
   }
 
   // ---------------------------------------------------------------- build static UI
@@ -811,8 +776,6 @@
   requestAnimationFrame(frame);
 
   const params = new URLSearchParams(location.search);
-  if (params.get("ws")) connectWs(params.get("ws"));
-  if (params.get("stream")) attachStream(params.get("stream"));
   if (params.get("autoplay") === "1") { opts.autoplay = el.optAutoplay.checked = true; }
   if (params.get("console") === "0") toggleConsole();
 })();

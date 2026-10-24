@@ -20,10 +20,7 @@ Real-time emergency first-aid assistant combining computer vision, an AI workflo
 | `docs/` | all | Workflow and task board |
 
 ## Run the AR glasses UI (Cal Hacks demo)
-```bash
-python -m http.server 5173 --directory src/ui
-```
-Open http://localhost:5173. Hooks for the vision team: [src/ui/README.md](src/ui/README.md).
+Front end only, no backend: open `src/ui/index.html` in a browser. Hooks for the vision team: [src/ui/README.md](src/ui/README.md).
 
 ## Start here
 1. Read [docs/WORKFLOW.md](docs/WORKFLOW.md) – how we work as a team.
