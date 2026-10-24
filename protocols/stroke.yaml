@@ -1,0 +1,47 @@
+id: stroke
+title: Stroke warning signs (FAST)
+priority: 3
+escalate_to_emergency_services: true
+dispatcher_summary: "Suspected stroke (FAST signs). Note time symptoms started."
+clarifying_question: "Is one side of the face drooping, one arm weak, or their speech slurred or confused?"
+trigger_signs:
+  face_droop: 0.7
+  arm_weakness: 0.7
+  speech_difficulty: 0.7
+  sudden_confusion: 0.4
+  severe_headache: 0.3
+  vision_loss: 0.4
+  loss_of_balance: 0.3
+steps:
+  - id: call_911
+    text: Call emergency services immediately. Say "possible stroke".
+    spoken: "Call 911 now and say possible stroke."
+    observable_action: null
+    needs_confirmation: true
+  - id: note_time
+    text: Note the time symptoms started (or when the person was last seen normal).
+    spoken: "Note what time the symptoms started."
+    observable_action: null
+    needs_confirmation: true
+  - id: fast_face
+    text: "Face: ask the person to smile. Does one side droop?"
+    spoken: "Ask them to smile. Does one side of the face droop?"
+    observable_action: smile_check
+    needs_confirmation: true
+  - id: fast_arms
+    text: "Arms: ask them to raise both arms. Does one drift down?"
+    spoken: "Ask them to raise both arms. Does one arm drift down?"
+    observable_action: arm_raise_check
+    needs_confirmation: true
+  - id: fast_speech
+    text: "Speech: ask them to repeat a simple sentence. Is it slurred or strange?"
+    spoken: "Ask them to repeat a simple sentence. Is their speech slurred?"
+    observable_action: null
+    needs_confirmation: true
+  - id: wait
+    text: Keep the person comfortable and seated or lying down. Give nothing to eat or drink. Stay with them.
+    spoken: "Keep them comfortable. Give no food or drink. Stay with them until help arrives."
+    observable_action: null
+    needs_confirmation: false
+reviewed_by: PENDING_MEDICAL_REVIEW
+source: "American Stroke Association FAST guidance (to be verified by reviewer)"
