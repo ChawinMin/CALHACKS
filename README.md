@@ -19,6 +19,9 @@ Real-time emergency first-aid assistant combining computer vision, an AI workflo
 | `protocols/` | 2, 5, 7 | Medically reviewed protocol definitions (source of truth) |
 | `docs/` | all | Workflow and task board |
 
+## Run the AR glasses UI (Cal Hacks demo)
+Front end only, no backend: open `src/ui/index.html` in a browser. Hooks for the vision team: [src/ui/README.md](src/ui/README.md).
+
 ## Start here
 1. Read [docs/WORKFLOW.md](docs/WORKFLOW.md) – how we work as a team.
 2. Pick a task in [docs/TASKS.md](docs/TASKS.md) and claim it.
